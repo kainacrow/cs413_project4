@@ -4,7 +4,7 @@ var gameScale = 4;
 
 var gameport = document.getElementById("gameport");
 
-var renderer = PIXI.autoDetectRenderer(gameWidth, gameHeight, {backgroundColor: 0x3bd2f2});
+var renderer = PIXI.autoDetectRenderer(gameWidth, gameHeight, {backgroundColor: 0x000});
 gameport.appendChild(renderer.view);
 
 var playing = false;
@@ -63,11 +63,22 @@ var entity_layer;
 var blue;
 var pink;
 var orange;
+
 var blueDoor;
 var pinkDoor;
 var orangeDoor;
 
-var spawn;
+var pinkMat;
+var blueMat;
+var orangeMat;
+
+var spawnOrange;
+var spawnPink;
+var spawnBlue;
+
+var leaveOrange;
+var leavePink;
+var leaveBlue;
 
 var walls = [];
 var doors = [];
@@ -93,6 +104,7 @@ function keydownEventHandler(e) {
     if([32, 37, 38, 39, 40, 9].indexOf(e.keyCode) > -1) {
         e.preventDefault();
     }    
+    movePlayer();
 }
 
 document.addEventListener('keydown', keydownEventHandler);
@@ -102,34 +114,46 @@ function movePlayer() {
     previousX = player.position.x;
     previousY = player.position.y;
     if(keys[87] || keys[38] && !moving) { // W key pressed
-      // if (!(collision(previousX, player.y - pixelMovement))){
+      console.log("UP");
+      if (!(collision(previousX, player.y - pixelMovement))){
         moving = true;
         newY = previousY - pixelMovement;
             createjs.Tween.get(player).to({y: newY}, speed).call(function() { moving = false; });
-        // }
-    }
-    if(keys[83] || keys[40]) { // S key pressed
-      if(!(collision(previousX, player.y + pixelMovement))){
-            createjs.Tween.get(player).to({y: player.y + pixelMovement}, speed).call(movePlayer);  
-        }  
-    }
-    if(keys[65] || keys[37]) { // A key pressed
-      if (!(collision(player.x - pixelMovement, previousY))){
-            createjs.Tween.get(player).to({x: player.x - pixelMovement}, speed).call(movePlayer);
         }
     }
-    if(keys[68] || keys[39]) { // D key pressed
+    if(keys[83] || keys[40] && !moving) { // S key pressed
+      console.log("Down");
+      if(!(collision(previousX, player.y + pixelMovement))){
+        moving = true;
+        newY = previousY + pixelMovement;
+            createjs.Tween.get(player).to({y: newY}, speed).call(function() { moving = false; });  
+        }  
+    }
+    if(keys[65] || keys[37] && !moving) { // A key pressed
+      console.log("left");
+      if (!(collision(player.x - pixelMovement, previousY))){
+        moving = true;
+        newX = previousX - pixelMovement;
+            createjs.Tween.get(player).to({x: newX}, speed).call(function() { moving = false; });
+        }
+    }
+    if(keys[68] || keys[39] && !moving) { // D key pressed
+      console.log("left");
       if (!(collision(player.x + pixelMovement, previousY))){
-            createjs.Tween.get(player).to({x: player.x + pixelMovement}, speed).call(movePlayer);
+        moving = true;
+        newX = previousX + pixelMovement;
+            createjs.Tween.get(player).to({x: newX}, speed).call(function() { moving = false; });
         }  
     }
 }
+
+PIXI.SCALE_MODES.DEFAULT = PIXI.SCALE_MODES.NEAREST;
 
 // loader
 PIXI.loader
     .add('map_json', 'map.json')
     .add('tileset', 'grid.png')
-    .add('man', 'tower1.png')
+    //.add('man', 'tower1.png')
     .add('assets.json')
     .add('font', 'minecraft.fnt')
     .load(ready);
@@ -150,13 +174,23 @@ function ready() {
     blueDoor = world.getObject("blueDoor");
     pinkDoor = world.getObject("pinkDoor");
     orangeDoor = world.getObject("orangeDoor");
+    person = new PIXI.Sprite(PIXI.Texture.fromFrame("ghost.png"));
 
-
-    spawn = world.getObject("spawn");
-    //console.log(world);
+    spawnOrange = world.getObject("spawnOrange");
+    spawnBlue = world.getObject("spawnBlue");
+    spawnPink = world.getObject("spawnPink");
+    
+    leaveOrange = world.getObject("leaveOrange");
+    leaveBlue = world.getObject("leaveBlue");
+    leavePink = world.getObject("leavePink");
+    
+    pinkMat = world.getObject("pinkMat");
+    blueMat = world.getObject("blueMat");
+    orangeMat = world.getObject("orangeMat");
+    
     var man = world.getObject("character");
 
-    player = new PIXI.Sprite(PIXI.loader.resources.man.texture);
+    player = person;
     player.x = man.x + player.width/2;
     player.y = man.y + player.width/2;
     player.anchor.x = 0.5;
@@ -168,8 +202,8 @@ function ready() {
     world.getObject("Entities").addChild(player);
     
     // two enemies in the game
-    enemy1 = new PIXI.Sprite(PIXI.Texture.fromFrame("villainSprite.png"));
-    enemy2 = new PIXI.Sprite(PIXI.Texture.fromFrame("villainSprite.png"));
+    enemy1 = new PIXI.Sprite(PIXI.Texture.fromFrame("fire.png"));
+    enemy2 = new PIXI.Sprite(PIXI.Texture.fromFrame("fire.png"));
     entity_layer.addChild(enemy1);
     entity_layer.addChild(enemy2);
 
@@ -204,51 +238,67 @@ function ready() {
 }
 
 function enterBluehouse() {
-  // console.log("b");
   entity_layer.visible = false;
-  console.log(world.getObject("Collision"));
   world.getObject("Collision").visible = false;
+  createjs.Tween.removeTweens(player);
   blue.visible = true;
-  console.log(spawn);
-  player.position.x = spawn.x;
-  player.position.y = spawn.y;
+  player.position.x = spawnBlue.x;
+  player.position.y = spawnBlue.y;
 }
 
 function enterPinkhouse() {
-  // console.log("p");
   entity_layer.visible = false;
   world.getObject("Collision").visible = false;
+  createjs.Tween.removeTweens(player);
   pink.visible = true;
-  player.position.x = spawn.x;
-  player.position.y = spawn.y;
-  createjs.Tween.removeTweens(player.position);
-
+  player.position.x = spawnPink.x;
+  player.position.y = spawnPink.y;
 }
 
 function enterOrangehouse() {
-  // console.log("o");
   entity_layer.visible = false;
   world.getObject("Collision").visible = false;
+  createjs.Tween.removeTweens(player);
   orange.visible = true;
-  player.position.x = spawn.x;
-  player.position.y = spawn.y;
-
+  player.position.x = spawnOrange.x;
+  player.position.y = spawnOrange.y;
 }
 
 function leaveHouse() {
-  entity_layer.visible = true;
-  orange.visible = false;
-  pink.visible = false;
-  blue.visible = false;
+  if (orange.visible == true){
+    entity_layer.visible = true;
+    createjs.Tween.removeTweens(player);
+    orange.visible = false;
+    player.position.x = leaveOrange.x;
+    player.position.y = leaveOrange.y;
+  }
+  else if(pink.visible == true){
+    entity_layer.visible = true;
+    createjs.Tween.removeTweens(player);
+    pink.visible = false;
+    player.position.x = leavePink.x;
+    player.position.y = leavePink.y;
+  }
+  else if (blue.visible == true){
+    entity_layer.visible = true;
+    createjs.Tween.removeTweens(player);
+    blue.visible = false;
+    player.position.x = leaveBlue.x;
+    player.position.y = leaveBlue.y;
+  }
+  // entity_layer.visible = true;
+  // orange.visible = false;
+  // pink.visible = false;
+  // blue.visible = false;
 }
 
 // animate function
 function animate() {
     requestAnimationFrame(animate);
-    movePlayer();
-    //console.log(player.direction);
     update_camera();
     doorCollision();
+    leaveCollision();
+    enemyCollision();
     renderer.render(stage);
 
     }
@@ -260,11 +310,8 @@ function movePointer(index) {
 }
 
 function collision(desX, desY) {
-  // console.log("fjhsdf");
   for (var i = 0; i < walls.length; i++){
-    //console.log(walls[i]);
         if (!(walls[i].x > (desX + player.width/2) || (walls[i].x + walls[i].width) < desX || walls[i].y > (desY + player.height/2) || (walls[i].y + walls[i].height) < desY)){
-          //  console.log("potato");
             return true;
         }
 
@@ -277,36 +324,44 @@ function doorCollision() {
   // for (var i = 0; i < doors.length; i++){
         if (!(blueDoor.x > (player.position.x + player.width/2) || (blueDoor.x + blueDoor.width) < player.position.x || blueDoor.y > (player.position.y + player.height/2) || (blueDoor.y + blueDoor.height) < player.position.y)){
             enterBluehouse();
-            // console.log(player.position.x, player.position.y);
-            
-            
         }
         else if (!(pinkDoor.x > (player.position.x + player.width/2) || (pinkDoor.x + pinkDoor.width) < player.position.x || pinkDoor.y > (player.position.y + player.height/2) || (pinkDoor.y + pinkDoor.height) < player.position.y)){
-            console.log(player.position);
             enterPinkhouse();
-            console.log(player.position);
         }
         else if (!(orangeDoor.x > (player.position.x + player.width/2) || (orangeDoor.x + orangeDoor.width) < player.position.x || orangeDoor.y > (player.position.y + player.height/2) || (orangeDoor.y + orangeDoor.height) < player.position.y)){
             enterOrangehouse();
           }
 return false;
   }
-          
+  
+function leaveCollision() {
+  // for (var i = 0; i < doors.length; i++){
+        if (!(blueMat.x > (player.position.x + player.width/2) || (blueMat.x + blueMat.width) < player.position.x || blueMat.y > (player.position.y + player.height/2) || (blueMat.y + blueMat.height) < player.position.y)){
+            leaveHouse();
+        }
+        else if (!(pinkMat.x > (player.position.x + player.width/2) || (pinkMat.x + pinkMat.width) < player.position.x || pinkMat.y > (player.position.y + player.height/2) || (pinkMat.y + pinkMat.height) < player.position.y)){
+            leaveHouse();
+        }
+        else if (!(orangeMat.x > (player.position.x + player.width/2) || (orangeMat.x + orangeMat.width) < player.position.x || orangeMat.y > (player.position.y + player.height/2) || (orangeMat.y + orangeMat.height) < player.position.y)){
+            leaveHouse();
+          }
+return false;
+  }
+  
+function enemyCollision() {
+  if (!(enemy1.x > (player.position.x + player.width/2) || (enemy1.x + enemy1.width) < player.position.x || enemy1.y > (player.position.y + player.height/2) || (enemy1.y + enemy1.height) < player.position.y)){
+            enterBluehouse();
+  }
 
-// function collision(desX, desY) {
-//   for (i = 0; i < walls.length; i++){
-//     //console.log(walls[i].x, desX);
-//   if ((walls[i].x === desX || desX === null) && (walls[i].y === desY || desY === null)) {
-//     return true;
-//   }
-//   }
-//   return false;
-// }
+if (!(enemy2.x > (player.position.x + player.width/2) || (enemy2.x + enemy2.width) < player.position.x || enemy2.y > (player.position.y + player.height/2) || (enemy2.y + enemy2.height) < player.position.y)){
+            enterBluehouse();
+}
+}        
 
 // camera movement
 function update_camera() {
     stage.x = -player.x*gameScale + gameWidth/2 - player.width/2*gameScale;
     stage.y = -player.y*gameScale + gameHeight/2 - player.height/2*gameScale;
-    stage.x = -Math.max(0, Math.min(world.worldWidth*gameScale - gameWidth, -stage.x));
+    stage.x = -Math.max(0, Math.min(1280*gameScale, -stage.x));
     stage.y = -Math.max(0, Math.min(world.worldHeight*gameScale - gameHeight, -stage.y));
 }

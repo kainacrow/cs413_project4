@@ -189,6 +189,8 @@
         <key>individualSpriteSettings</key>
         <map type="IndividualSpriteSettingsMap">
             <key type="filename">arrow.png</key>
+            <key type="filename">fire.png</key>
+            <key type="filename">ghost.png</key>
             <key type="filename">tower1.png</key>
             <key type="filename">villainSprite.png</key>
             <struct type="IndividualSpriteSettings">
@@ -201,6 +203,8 @@
             <filename>tower1.png</filename>
             <filename>villainSprite.png</filename>
             <filename>arrow.png</filename>
+            <filename>ghost.png</filename>
+            <filename>fire.png</filename>
         </array>
         <key>ignoreFileList</key>
         <array/>
