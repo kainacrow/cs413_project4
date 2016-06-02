@@ -53,11 +53,11 @@ var player;
 var world;
 
 // Character movement constants:
-var moveLeft = 1;
-var moveRight = 2;
-var moveUp = 3;
-var moveDown = 4;
-var moveNone = 0;
+// var moveLeft = 1;
+// var moveRight = 2;
+// var moveUp = 3;
+// var moveDown = 4;
+// var moveNone = 0;
 
 var entity_layer;
 var blue;
@@ -81,86 +81,49 @@ var game = false;
 var pixelMovement = 32;
 var speed = 200;
 
-// the move function starts of continues movement
-function move() {
-  previousX = player.position.x;
-  previousY = player.position.y;
-  
-    if (player.direction == moveNone) {
-    player.moving = false;
-    // console.log(player.y);
-    return;
-  }
-  
-  if (player.direction == moveLeft) {
-    // console.log(player.x - pixelMovement);
-    // console.log((!(collision(player.x - pixelMovement, null))));
-    
+var keys = {};
+var moving = false;
 
-    if (!(collision(player.x - pixelMovement, previousY))){
-    createjs.Tween.get(player).to({x: player.x - pixelMovement}, speed).call(move);
-    player.moving = true;
-    }
-  }
-  if (player.direction == moveRight) {
-    console.log(player.position.x);
-      createjs.Tween.get(player).to({x: player.x + pixelMovement}, speed).call(move);
-          player.moving = true;
-
-  }
-  if (player.direction == moveUp)
-    createjs.Tween.get(player).to({y: player.y - pixelMovement}, speed).call(move);
-        player.moving = true;
-
-  
-  if (player.direction == moveDown)
-    createjs.Tween.get(player).to({y: player.y + pixelMovement}, speed).call(move);  
-        player.moving = true;
-
-
-//   console.log("move");
+function keyupEventHandler(e) {
+    keys[e.which] = false;
 }
 
-// Keydown events start movement
-window.addEventListener("keydown", function (e) {
-  e.preventDefault();
-  if (!playing){
-    if (e.keyCode === 87 || e.keyCode === 38) { menu.up(); }
-		if (e.keyCode === 83 || e.keyCode === 40) { menu.down(); }
-		if (e.keyCode === 13 || e.keyCode === 32) { menu.getChildAt(currState+2).action(); }
-  }
+function keydownEventHandler(e) {
+    keys[e.which] = true;
+    if([32, 37, 38, 39, 40, 9].indexOf(e.keyCode) > -1) {
+        e.preventDefault();
+    }    
+}
 
-  if (!player) return;
- // console.log(player.moving); //shitty line
-  // if (player.moving) return;
-   
-  if (e.repeat == true) return;
-  
-  player.direction = moveNone;
+document.addEventListener('keydown', keydownEventHandler);
+document.addEventListener('keyup', keyupEventHandler);
 
-  if (e.keyCode == 87)
-    player.direction = moveUp;
-  else if (e.keyCode == 83)
-    player.direction = moveDown;
-  else if (e.keyCode == 65)
-    player.direction = moveLeft;
-  else if (e.keyCode == 68)
-    player.direction = moveRight;
-    
-    console.log(player.direction);
-
-//   console.log(e.keyCode);
-  move();
-});
-
-// Keyup events end movement
-window.addEventListener("keyup", function onKeyUp(e) {
-  e.preventDefault();
-  if (!player) return;
-  player.direction = moveNone;
-});
-
-PIXI.SCALE_MODES.DEFAULT = PIXI.SCALE_MODES.NEAREST;
+function movePlayer() {
+    previousX = player.position.x;
+    previousY = player.position.y;
+    if(keys[87] || keys[38] && !moving) { // W key pressed
+      // if (!(collision(previousX, player.y - pixelMovement))){
+        moving = true;
+        newY = previousY - pixelMovement;
+            createjs.Tween.get(player).to({y: newY}, speed).call(function() { moving = false; });
+        // }
+    }
+    if(keys[83] || keys[40]) { // S key pressed
+      if(!(collision(previousX, player.y + pixelMovement))){
+            createjs.Tween.get(player).to({y: player.y + pixelMovement}, speed).call(movePlayer);  
+        }  
+    }
+    if(keys[65] || keys[37]) { // A key pressed
+      if (!(collision(player.x - pixelMovement, previousY))){
+            createjs.Tween.get(player).to({x: player.x - pixelMovement}, speed).call(movePlayer);
+        }
+    }
+    if(keys[68] || keys[39]) { // D key pressed
+      if (!(collision(player.x + pixelMovement, previousY))){
+            createjs.Tween.get(player).to({x: player.x + pixelMovement}, speed).call(movePlayer);
+        }  
+    }
+}
 
 // loader
 PIXI.loader
@@ -168,6 +131,7 @@ PIXI.loader
     .add('tileset', 'grid.png')
     .add('man', 'tower1.png')
     .add('assets.json')
+    .add('font', 'minecraft.fnt')
     .load(ready);
     
 // ready function
@@ -188,7 +152,7 @@ function ready() {
     orangeDoor = world.getObject("orangeDoor");
 
 
-    spawn = world.getObject("spawn")
+    spawn = world.getObject("spawn");
     //console.log(world);
     var man = world.getObject("character");
 
@@ -240,29 +204,34 @@ function ready() {
 }
 
 function enterBluehouse() {
-  console.log("b");
+  // console.log("b");
   entity_layer.visible = false;
   console.log(world.getObject("Collision"));
   world.getObject("Collision").visible = false;
   blue.visible = true;
-  player.position = spawn;
+  console.log(spawn);
+  player.position.x = spawn.x;
+  player.position.y = spawn.y;
 }
 
 function enterPinkhouse() {
-  console.log("p");
+  // console.log("p");
   entity_layer.visible = false;
   world.getObject("Collision").visible = false;
   pink.visible = true;
-  player.position = spawn;
+  player.position.x = spawn.x;
+  player.position.y = spawn.y;
+  createjs.Tween.removeTweens(player.position);
 
 }
 
 function enterOrangehouse() {
-  console.log("o");
+  // console.log("o");
   entity_layer.visible = false;
   world.getObject("Collision").visible = false;
   orange.visible = true;
-  player.position = spawn;
+  player.position.x = spawn.x;
+  player.position.y = spawn.y;
 
 }
 
@@ -276,6 +245,7 @@ function leaveHouse() {
 // animate function
 function animate() {
     requestAnimationFrame(animate);
+    movePlayer();
     //console.log(player.direction);
     update_camera();
     doorCollision();
@@ -290,9 +260,11 @@ function movePointer(index) {
 }
 
 function collision(desX, desY) {
+  // console.log("fjhsdf");
   for (var i = 0; i < walls.length; i++){
     //console.log(walls[i]);
         if (!(walls[i].x > (desX + player.width/2) || (walls[i].x + walls[i].width) < desX || walls[i].y > (desY + player.height/2) || (walls[i].y + walls[i].height) < desY)){
+          //  console.log("potato");
             return true;
         }
 
@@ -305,9 +277,14 @@ function doorCollision() {
   // for (var i = 0; i < doors.length; i++){
         if (!(blueDoor.x > (player.position.x + player.width/2) || (blueDoor.x + blueDoor.width) < player.position.x || blueDoor.y > (player.position.y + player.height/2) || (blueDoor.y + blueDoor.height) < player.position.y)){
             enterBluehouse();
+            // console.log(player.position.x, player.position.y);
+            
+            
         }
         else if (!(pinkDoor.x > (player.position.x + player.width/2) || (pinkDoor.x + pinkDoor.width) < player.position.x || pinkDoor.y > (player.position.y + player.height/2) || (pinkDoor.y + pinkDoor.height) < player.position.y)){
+            console.log(player.position);
             enterPinkhouse();
+            console.log(player.position);
         }
         else if (!(orangeDoor.x > (player.position.x + player.width/2) || (orangeDoor.x + orangeDoor.width) < player.position.x || orangeDoor.y > (player.position.y + player.height/2) || (orangeDoor.y + orangeDoor.height) < player.position.y)){
             enterOrangehouse();
