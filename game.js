@@ -10,8 +10,8 @@ gameport.appendChild(renderer.view);
 var playing = false;
 var currentState = 0;
 
-var housesVisited = [];
-
+var housesVisited = [false, false, false];
+var enemiesKilled = [false, false];
 var menu;
 var menuStateMachine = StateMachine.create({
   initial: {state: 'play', event: 'init'},
@@ -98,6 +98,7 @@ function keyupEventHandler(e) {
 }
 
 function keydownEventHandler(e) {
+    // gameSound.play();
     keys[e.which] = true;
     
     if (inMenu) {
@@ -125,6 +126,9 @@ document.addEventListener('keydown', keydownEventHandler);
 document.addEventListener('keyup', keyupEventHandler);
 
 function movePlayer() {
+  if(playing){
+    sound.play();
+  }
     previousX = player.position.x;
     previousY = player.position.y;
     if(keys[87] || keys[38] && !moving) { // W key pressed
@@ -168,6 +172,8 @@ PIXI.loader
     .add('map_json', 'map.json')
     .add('tileset', 'grid.png')
     .add('boop.mp3')
+    .add('ghostNoises.mp3')
+    .add("whoosh.mp3")
     .add('assets.json')
     .add('font', 'minecraft.fnt')
     .load(ready);
@@ -178,16 +184,15 @@ function ready() {
     textures["mainMenu"] = PIXI.Texture.fromFrame("mainmenu.png");
     textures["arrow"] = PIXI.Texture.fromFrame("arrow.png");
     
+    gameSound = PIXI.audioManager.getAudio("boop.mp3");
+    sound = PIXI.audioManager.getAudio('ghostNoises.mp3');
+    sound.loop = true;
+    whoosh = PIXI.audioManager.getAudio('whoosh.mp3');
+    
     loadMainMenu(true);
     animate();
 }
 
-function soundready() {
-    gameSound = PIXI.audioManager.getAudio("boop.mp3");
-    gameSound.loop = true;
-    if(playing == true)
-    gameSound.play();
-}
 
 function enterBluehouse() {
   entity_layer.visible = false;
@@ -407,7 +412,6 @@ function loadInstructions() {
 		stage.addChild(menu);
 }
 
-
 function collision(desX, desY) {
   for (var i = 0; i < walls.length; i++){
         if (!(walls[i].x > (desX + player.width/2) || (walls[i].x + walls[i].width) < desX || walls[i].y > (desY + player.height/2) || (walls[i].y + walls[i].height) < desY)){
@@ -421,6 +425,7 @@ function fridgeCollision() {
   previousX = player.position.x;
   previousY = player.position.y;
   if (!(orangeFridge.x > (player.position.x + player.width/2) || (orangeFridge.x + orangeFridge.width) < player.position.x || orangeFridge.y > (player.position.y + player.height/2) || (orangeFridge.y + orangeFridge.height) < player.position.y)){
+      whoosh.play();
       console.log("collison");
       housesVisited[0] = true;
       //console.log(housesVisited);
@@ -429,16 +434,20 @@ function fridgeCollision() {
       // player.position.y = previousY;
   }
   else if (!(blueFridge.x > (player.position.x + player.width/2) || (blueFridge.x + blueFridge.width) < player.position.x || blueFridge.y > (player.position.y + player.height/2) || (blueFridge.y + blueFridge.height) < player.position.y)){
+      whoosh.play();
       if (housesVisited[0] == true){
+        whoosh.play();
         housesVisited[1] = true;
         player.texture = PIXI.Texture.fromFrame("frosty.png");
         
       }
   }
   else if (!(pinkFridge.x > (player.position.x + player.width/2) || (pinkFridge.x + pinkFridge.width) < player.position.x || pinkFridge.y > (player.position.y + player.height/2) || (pinkFridge.y + pinkFridge.height) < player.position.y)){
-      if (housesVisited[1] == true)
+      if (housesVisited[1] == true && housesVisited[0] == true){
+        whoosh.play();
         housesVisited[2] = true;
         player.texture = PIXI.Texture.fromFrame("ice.png");
+      }
   }
 }
 
@@ -475,7 +484,7 @@ function enemyCollision() {
     if (!(enemy1.x > (player.position.x + player.width/2) || (enemy1.x + enemy1.width) < player.position.x || enemy1.y > (player.position.y + player.height/2) || (enemy1.y + enemy1.height) < player.position.y)){
               console.log("collision");
               gameOver();
-              //enterBluehouse();
+              //enterBluehouse();  
     }
 
     if (!(enemy2.x > (player.position.x + player.width/2) || (enemy2.x + enemy2.width) < player.position.x || enemy2.y > (player.position.y + player.height/2) || (enemy2.y + enemy2.height) < player.position.y)){
@@ -483,22 +492,86 @@ function enemyCollision() {
                 //enterBluehouse();
     }
   }
-  else {
-    //gameOver();
+  else if (player.texture === PIXI.Texture.fromFrame("ice.png")){
+    if(!(enemy1.x > (player.position.x + player.width/2) || (enemy1.x + enemy1.width) < player.position.x || enemy1.y > (player.position.y + player.height/2) || (enemy1.y + enemy1.height) < player.position.y)){
+      enemiesKilled[0] = true;
+      entity_layer.removeChild(enemy1);
+    }
+    else if(!(enemy2.x > (player.position.x + player.width/2) || (enemy2.x + enemy2.width) < player.position.x || enemy2.y > (player.position.y + player.height/2) || (enemy2.y + enemy2.height) < player.position.y)){
+      enemiesKilled[1] = true;
+      entity_layer.removeChild(enemy2);
+    }
+    if(enemiesKilled[0] === true && enemiesKilled[1] === true){
+      winGame();
+    }
   }
 }        
 
-function displayText(words) {
-	text.alpha = 1;
-  currentText = words;
+function gameOver() {
+    playing = false;
+    moving = false;
+    
+    clearStage();
+		atMainMenu = false;
+    
+		menu = new PIXI.Container();
+
+		background = new PIXI.Sprite(textures.mainMenu);
+		background.width = GAME_WIDTH/GAME_SCALE;
+		background.height = GAME_HEIGHT/GAME_SCALE;
+    stage.y = 0;
+    stage.x = 0;
+		menu.addChild(background);
+
+		title = new PIXI.extras.BitmapText("\n\nOH NO!",{font: "58px minecraft", align: "center"});
+		title.scale.x = 1/GAME_SCALE;
+		title.scale.y = 1/GAME_SCALE;
+		title.position.x = GAME_WIDTH/GAME_SCALE/2 - title.width/2;
+		title.position.y = 10;
+		menu.addChild(title);
+
+		loseText = new PIXI.extras.BitmapText("\n\n\nYou have been defeated by\nthe fire ghosts!\n\nYour village has been taken over!",{font: "36px minecraft", align: "center"});
+		loseText.scale.x = 1/GAME_SCALE;
+		loseText.scale.y = 1/GAME_SCALE;
+		loseText.position.x = GAME_WIDTH/GAME_SCALE/2 - loseText.width/2;
+		loseText.position.y = 20 + GAME_HEIGHT/GAME_SCALE/8;
+		menu.addChild(loseText);
+        
+		stage.addChild(menu);
+  
 }
 
-function gameOver() {
-  playing = false;
-  moving = false;
-  displayText("hsdkhfsklfhksf");
-  currentText = "sfsfsfs";
-  
+function winGame() {
+    playing = false;
+    moving = false;
+
+		clearStage();
+		atMainMenu = false;
+    
+		menu = new PIXI.Container();
+
+		background = new PIXI.Sprite(textures.mainMenu);
+		background.width = GAME_WIDTH/GAME_SCALE;
+		background.height = GAME_HEIGHT/GAME_SCALE;
+    stage.x = 0;
+    stage.y = 0
+		menu.addChild(background);
+
+		title = new PIXI.extras.BitmapText("\n\nCongratulations!",{font: "58px minecraft", align: "center"});
+		title.scale.x = 1/GAME_SCALE;
+		title.scale.y = 1/GAME_SCALE;
+		title.position.x = GAME_WIDTH/GAME_SCALE/2 - title.width/2;
+		title.position.y = 10;
+		menu.addChild(title);
+
+		loseText = new PIXI.extras.BitmapText("\n\n\nYou have successfully defeated all\nof the fire ghosts!\n\nYour village is safe!",{font: "36px minecraft", align: "center"});
+		loseText.scale.x = 1/GAME_SCALE;
+		loseText.scale.y = 1/GAME_SCALE;
+		loseText.position.x = GAME_WIDTH/GAME_SCALE/2 - loseText.width/2;
+		loseText.position.y = 20 + GAME_HEIGHT/GAME_SCALE/8;
+		menu.addChild(loseText);
+        
+		stage.addChild(menu);
 }
 
 
@@ -507,6 +580,7 @@ function clearStage() {
 			stage.removeChild(stage.children[0]);
 		}
 	}
+  
   function startGame() {
 
 
@@ -569,14 +643,6 @@ function clearStage() {
     enemy2 = new PIXI.Sprite(PIXI.Texture.fromFrame("fire.png"));
     entity_layer.addChild(enemy1);
     entity_layer.addChild(enemy2);
-
-
-    // entity_layer.addChild(startText);
-    // entity_layer.addChild(winText);
-    // winText.visible = false;
-        
-    // player.direction = moveNone;
-    // player.moving = false;
     
     enemy1.position.y = 425;
     enemy1.position.x = 250;
