@@ -198,6 +198,7 @@
             <key type="filename">ghost4.png</key>
             <key type="filename">grey.png</key>
             <key type="filename">ice.png</key>
+            <key type="filename">mainmenu.png</key>
             <struct type="IndividualSpriteSettings">
                 <key>pivotPoint</key>
                 <point_f>0.5,0.5</point_f>
@@ -215,6 +216,7 @@
             <filename>ghost2.png</filename>
             <filename>ghost3.png</filename>
             <filename>ghost4.png</filename>
+            <filename>mainmenu.png</filename>
         </array>
         <key>ignoreFileList</key>
         <array/>

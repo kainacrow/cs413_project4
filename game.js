@@ -1,10 +1,10 @@
-var gameHeight = 1550;//650;
-var gameWidth = 1550;//1050;
-var gameScale = 4;
+var GAME_HEIGHT = 1550;//650;
+var GAME_WIDTH = 1550;//1050;
+var GAME_SCALE = 4;
 
 var gameport = document.getElementById("gameport");
 
-var renderer = PIXI.autoDetectRenderer(gameWidth, gameHeight, {backgroundColor: 0x000});
+var renderer = PIXI.autoDetectRenderer(GAME_WIDTH, GAME_HEIGHT, {backgroundColor: 0x000});
 gameport.appendChild(renderer.view);
 
 var playing = false;
@@ -12,7 +12,7 @@ var currentState = 0;
 
 var housesVisited = [];
 
-var menu = StateMachine.create({
+var menuStateMachine = StateMachine.create({
   initial: {state: 'play', event: 'init'},
   error: function () {},
   events: [
@@ -27,39 +27,24 @@ var menu = StateMachine.create({
     {name: "up", from: "credits", to: "options"}],
     
     callbacks: {
-      onplay: function () { movePointer(0); currentState = 0; },
-      oninstructions: function() { movePointer(1); currentState = 1; },
-      onoptions: function() { movePointer(2); currentState = 2; },
-      oncredits: function() { movePointer(3); currentState = 3; }
+      onplay: function () { moveArrow(0); currentState = 0; },
+      oninstructions: function() { moveArrow(1); currentState = 1; },
+      onoptions: function() { moveArrow(2); currentState = 2; },
+      oncredits: function() { moveArrow(3); currentState = 3; }
     }
 });
 
-// // var start = new PIXI.Sprite(PIXI.Texture.fromImage("instructions1.png"));
-// var startText = new PIXI.Text("Press Enter\nto play", {font: "12px Monospace", fill: "#fff", strokeThickness: 3});
-// startText.position.y = 50;
-// startText.position.x = 20;
-
-// var winText = new PIXI.Text("You have\nsuccessfully\nkilled all\nthe villains\nCongrats!", {font: "12px Monospace", fill: "#fff", strokeThickness: 3});
-// winText.position.y = 20;
-// winText.position.x = 20;
-
 var stage = new PIXI.Container();
-stage.scale.x = gameScale;
-stage.scale.y = gameScale;
+stage.scale.x = GAME_SCALE;
+stage.scale.y = GAME_SCALE;
 
-
-// var start = false;
 
 // Scene objects get loaded in the ready function
 var player;
 var world;
 
-// Character movement constants:
-// var moveLeft = 1;
-// var moveRight = 2;
-// var moveUp = 3;
-// var moveDown = 4;
-// var moveNone = 0;
+var currentText;
+var text;
 
 var entity_layer;
 var blue;
@@ -105,6 +90,7 @@ var ghost;
 var ice;
 var grey;
 var frosty;
+var textures = {};
 
 function keyupEventHandler(e) {
     keys[e.which] = false;
@@ -177,6 +163,9 @@ function ready() {
     var tu = new TileUtilities(PIXI);
     world = tu.makeTiledWorld("map_json", "grid.png");
     stage.addChild(world);
+    
+    textures["mainMenu"] = PIXI.Texture.fromFrame("mainmenu.png");
+    textures["arrow"] = PIXI.Texture.fromFrame("arrow.png");
     
     blue = world.getObject("blueHouse");
     pink = world.getObject("pinkHouse");
@@ -253,6 +242,8 @@ function ready() {
     .to({x:enemy2.position.x + 200}, 2000, createjs.Ease.getelasticInOut)
     .to({y:enemy2.position.y}, 5000, createjs.Ease.quartOut)
     .to({x:enemy2.position.x}, 6000, createjs.Ease.sineIn);
+     
+     loadMainMenu(true);
      animate();
 }
 
@@ -320,13 +311,14 @@ function animate() {
     enemyCollision();
     fridgeCollision();
     renderer.render(stage);
+}
 
-    }
 
-function movePointer(index) {
+
+function moveArrow(index) {
 	elem = menu.getChildAt(index+2);
-	createjs.Tween.removeTweens(pointer.position);
-	createjs.Tween.get(pointer.position).to({y: elem.position.y, x: elem.position.x - pointer.width - 10}, 500, createjs.Ease.bounceOut);
+	createjs.Tween.removeTweens(arrow.position);
+	createjs.Tween.get(arrow.position).to({y: elem.position.y, x: elem.position.x - arrow.width - 10}, 500, createjs.Ease.cubicOut);
 }
 
 function collision(desX, desY) {
@@ -393,34 +385,51 @@ return false;
   
 function enemyCollision() {
   if (player.texture !== PIXI.Texture.fromFrame("ice.png")){
-  if (!(enemy1.x > (player.position.x + player.width/2) || (enemy1.x + enemy1.width) < player.position.x || enemy1.y > (player.position.y + player.height/2) || (enemy1.y + enemy1.height) < player.position.y)){
-            enterBluehouse();
-  }
+    if (!(enemy1.x > (player.position.x + player.width/2) || (enemy1.x + enemy1.width) < player.position.x || enemy1.y > (player.position.y + player.height/2) || (enemy1.y + enemy1.height) < player.position.y)){
+              gameOver;
+              //enterBluehouse();
+    }
 
-if (!(enemy2.x > (player.position.x + player.width/2) || (enemy2.x + enemy2.width) < player.position.x || enemy2.y > (player.position.y + player.height/2) || (enemy2.y + enemy2.height) < player.position.y)){
-            enterBluehouse();
-}
-}
+    if (!(enemy2.x > (player.position.x + player.width/2) || (enemy2.x + enemy2.width) < player.position.x || enemy2.y > (player.position.y + player.height/2) || (enemy2.y + enemy2.height) < player.position.y)){
+                gameOver;
+                //enterBluehouse();
+    }
+  }
+  else {
+    //gameOver();
+  }
 }        
+
+function displayText(words) {
+	text.alpha = 1;
+  currentText = words;
+}
+
+function gameOver() {
+  playing = false;
+  moving = false;
+  displayText("hsdkhfsklfhksf");
+  
+}
 
 // camera movement
 function update_camera() {
-    stage.x = -player.x*gameScale + gameWidth/2 - player.width/2*gameScale;
-    stage.y = -player.y*gameScale + gameHeight/2 - player.height/2*gameScale;
+    stage.x = -player.x*GAME_SCALE + GAME_WIDTH/2 - player.width/2*GAME_SCALE;
+    stage.y = -player.y*GAME_SCALE + GAME_HEIGHT/2 - player.height/2*GAME_SCALE;
     if (entity_layer.visible == true){
-      stage.x = -Math.max(0, Math.min(1280*gameScale-gameWidth, -stage.x));
-      stage.y = -Math.max(0, Math.min(world.worldHeight*gameScale - gameHeight, -stage.y));
+      stage.x = -Math.max(0, Math.min(1280*GAME_SCALE-GAME_WIDTH, -stage.x));
+      stage.y = -Math.max(0, Math.min(world.worldHeight*GAME_SCALE - GAME_HEIGHT, -stage.y));
     }
     else if (pink.visible == true) {
-      stage.x = -Math.max(1280*gameScale, Math.min(1696*gameScale-gameWidth, -stage.x));
-      stage.y = -Math.max(320*gameScale, Math.min(640*gameScale - gameHeight, -stage.y));
+      stage.x = -Math.max(1280*GAME_SCALE, Math.min(1696*GAME_SCALE-GAME_WIDTH, -stage.x));
+      stage.y = -Math.max(320*GAME_SCALE, Math.min(640*GAME_SCALE - GAME_HEIGHT, -stage.y));
     }
     else if(orange.visible == true) {
-      stage.x = -Math.max(1280*gameScale, Math.min(1696*gameScale-gameWidth, -stage.x));
-      stage.y = -Math.max(0, Math.min(320*gameScale - gameHeight, -stage.y));
+      stage.x = -Math.max(1280*GAME_SCALE, Math.min(1696*GAME_SCALE-GAME_WIDTH, -stage.x));
+      stage.y = -Math.max(0, Math.min(320*GAME_SCALE - GAME_HEIGHT, -stage.y));
     }
     else if(blue.visible == true){
-      stage.x = -Math.max(1280*gameScale, Math.min(1696*gameScale-gameWidth, -stage.x));
-      stage.y = -Math.max(640*gameScale, Math.min(960*gameScale - gameHeight, -stage.y));
+      stage.x = -Math.max(1280*GAME_SCALE, Math.min(1696*GAME_SCALE-GAME_WIDTH, -stage.x));
+      stage.y = -Math.max(640*GAME_SCALE, Math.min(960*GAME_SCALE - GAME_HEIGHT, -stage.y));
     }
 }
