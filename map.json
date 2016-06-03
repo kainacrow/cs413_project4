@@ -17,7 +17,7 @@
          "name":"blueHouse",
          "opacity":1,
          "type":"tilelayer",
-         "visible":true,
+         "visible":false,
          "width":53,
          "x":0,
          "y":0
@@ -28,7 +28,7 @@
          "name":"pinkHouse",
          "opacity":1,
          "type":"tilelayer",
-         "visible":true,
+         "visible":false,
          "width":53,
          "x":0,
          "y":0
@@ -39,7 +39,7 @@
          "name":"orangeHouse",
          "opacity":1,
          "type":"tilelayer",
-         "visible":true,
+         "visible":false,
          "width":53,
          "x":0,
          "y":0
@@ -193,15 +193,15 @@
                  "y":-0.0410980856300114
                 }, 
                 {
-                 "height":121.504022768321,
+                 "height":122,
                  "id":129,
                  "name":"pinkFridge",
                  "rotation":0,
                  "type":"",
                  "visible":true,
-                 "width":84.2865743527996,
+                 "width":84,
                  "x":1472,
-                 "y":401.455859011548
+                 "y":401
                 }, 
                 {
                  "height":126.324368378158,

@@ -193,6 +193,9 @@
             <key type="filename">fridge.png</key>
             <key type="filename">frosty.png</key>
             <key type="filename">ghost.png</key>
+            <key type="filename">ghost2.png</key>
+            <key type="filename">ghost3.png</key>
+            <key type="filename">ghost4.png</key>
             <key type="filename">grey.png</key>
             <key type="filename">ice.png</key>
             <struct type="IndividualSpriteSettings">
@@ -209,6 +212,9 @@
             <filename>grey.png</filename>
             <filename>ice.png</filename>
             <filename>fridge.png</filename>
+            <filename>ghost2.png</filename>
+            <filename>ghost3.png</filename>
+            <filename>ghost4.png</filename>
         </array>
         <key>ignoreFileList</key>
         <array/>

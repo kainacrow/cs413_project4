@@ -82,6 +82,10 @@ var leaveOrange;
 var leavePink;
 var leaveBlue;
 
+var pinkFridge;
+var blueFridge;
+var orangeFridge;
+
 var walls = [];
 var doors = [];
 
@@ -96,6 +100,11 @@ var speed = 200;
 
 var keys = {};
 var moving = false;
+
+var ghost;
+var ice;
+var grey;
+var frosty;
 
 function keyupEventHandler(e) {
     keys[e.which] = false;
@@ -176,7 +185,15 @@ function ready() {
     blueDoor = world.getObject("blueDoor");
     pinkDoor = world.getObject("pinkDoor");
     orangeDoor = world.getObject("orangeDoor");
-    person = new PIXI.Sprite(PIXI.Texture.fromFrame("ghost.png"));
+    
+    pinkFridge = world.getObject("pinkFridge");
+    blueFridge = world.getObject("blueFridge");
+    orangeFridge = world.getObject("orangeFridge");
+    
+    ghost = new PIXI.Sprite(PIXI.Texture.fromFrame("ghost.png"));
+    frosty = new PIXI.Sprite(PIXI.Texture.fromFrame("frosty.png"));
+    grey = new PIXI.Sprite(PIXI.Texture.fromFrame("grey.png"));
+    ice = new PIXI.Sprite(PIXI.Texture.fromFrame("ice.png"));
 
     spawnOrange = world.getObject("spawnOrange");
     spawnBlue = world.getObject("spawnBlue");
@@ -192,7 +209,7 @@ function ready() {
     
     var man = world.getObject("character");
 
-    player = person;
+    player = ghost;
     player.x = man.x + player.width/2;
     player.y = man.y + player.width/2;
     player.anchor.x = 0.5;
@@ -301,6 +318,7 @@ function animate() {
     doorCollision();
     leaveCollision();
     enemyCollision();
+    fridgeCollision();
     renderer.render(stage);
 
     }
@@ -316,10 +334,33 @@ function collision(desX, desY) {
         if (!(walls[i].x > (desX + player.width/2) || (walls[i].x + walls[i].width) < desX || walls[i].y > (desY + player.height/2) || (walls[i].y + walls[i].height) < desY)){
             return true;
         }
-
   }
           return false;
-  
+}
+
+function fridgeCollision() {
+  previousX = player.position.x;
+  previousY = player.position.y;
+  if (!(pinkFridge.x > (player.position.x + player.width/2) || (pinkFridge.x + pinkFridge.width) < player.position.x || pinkFridge.y > (player.position.y + player.height/2) || (pinkFridge.y + pinkFridge.height) < player.position.y)){
+      console.log("collison");
+      housesVisited[0] = true;
+      //console.log(housesVisited);
+      player.texture = PIXI.Texture.fromFrame("grey.png");
+      // player.position.x = previousX;
+      // player.position.y = previousY;
+  }
+  else if (!(blueFridge.x > (player.position.x + player.width/2) || (blueFridge.x + blueFridge.width) < player.position.x || blueFridge.y > (player.position.y + player.height/2) || (blueFridge.y + blueFridge.height) < player.position.y)){
+      if (housesVisited[0] == true){
+        housesVisited[1] = true;
+        player.texture = PIXI.Texture.fromFrame("frosty.png");
+        
+      }
+  }
+  else if (!(orangeFridge.x > (player.position.x + player.width/2) || (orangeFridge.x + orangeFridge.width) < player.position.x || orangeFridge.y > (player.position.y + player.height/2) || (orangeFridge.y + orangeFridge.height) < player.position.y)){
+      if (housesVisited[1] == true)
+        housesVisited[2] = true;
+        player.texture = PIXI.Texture.fromFrame("ice.png");
+  }
 }
 
 function doorCollision() {
@@ -351,12 +392,14 @@ return false;
   }
   
 function enemyCollision() {
+  if (player.texture !== PIXI.Texture.fromFrame("ice.png")){
   if (!(enemy1.x > (player.position.x + player.width/2) || (enemy1.x + enemy1.width) < player.position.x || enemy1.y > (player.position.y + player.height/2) || (enemy1.y + enemy1.height) < player.position.y)){
             enterBluehouse();
   }
 
 if (!(enemy2.x > (player.position.x + player.width/2) || (enemy2.x + enemy2.width) < player.position.x || enemy2.y > (player.position.y + player.height/2) || (enemy2.y + enemy2.height) < player.position.y)){
             enterBluehouse();
+}
 }
 }        
 
