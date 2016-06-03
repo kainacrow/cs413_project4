@@ -190,9 +190,11 @@
         <map type="IndividualSpriteSettingsMap">
             <key type="filename">arrow.png</key>
             <key type="filename">fire.png</key>
+            <key type="filename">fridge.png</key>
+            <key type="filename">frosty.png</key>
             <key type="filename">ghost.png</key>
-            <key type="filename">tower1.png</key>
-            <key type="filename">villainSprite.png</key>
+            <key type="filename">grey.png</key>
+            <key type="filename">ice.png</key>
             <struct type="IndividualSpriteSettings">
                 <key>pivotPoint</key>
                 <point_f>0.5,0.5</point_f>
@@ -200,11 +202,13 @@
         </map>
         <key>fileList</key>
         <array>
-            <filename>tower1.png</filename>
-            <filename>villainSprite.png</filename>
             <filename>arrow.png</filename>
             <filename>ghost.png</filename>
             <filename>fire.png</filename>
+            <filename>frosty.png</filename>
+            <filename>grey.png</filename>
+            <filename>ice.png</filename>
+            <filename>fridge.png</filename>
         </array>
         <key>ignoreFileList</key>
         <array/>

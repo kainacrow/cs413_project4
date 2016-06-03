@@ -1,5 +1,5 @@
-var gameHeight = 650;
-var gameWidth = 1050;
+var gameHeight = 1550;//650;
+var gameWidth = 1550;//1050;
 var gameScale = 4;
 
 var gameport = document.getElementById("gameport");
@@ -9,6 +9,8 @@ gameport.appendChild(renderer.view);
 
 var playing = false;
 var currentState = 0;
+
+var housesVisited = [];
 
 var menu = StateMachine.create({
   initial: {state: 'play', event: 'init'},
@@ -215,9 +217,9 @@ function ready() {
     // player.direction = moveNone;
     // player.moving = false;
     
-    enemy1.position.y = 395;
-    enemy1.position.x = 300;
-    enemy2.position.y = 100;
+    enemy1.position.y = 425;
+    enemy1.position.x = 250;
+    enemy2.position.y = 200;
     enemy2.position.x = 50;
     //var target = {x: 500, y: 345};
     createjs.Tween.get(enemy1.position, {loop:true})
@@ -232,7 +234,7 @@ function ready() {
     .to({x:enemy2.position.x}, 6000, createjs.Ease.quartOut)
     .to({y:enemy2.position.y + 200}, 3000, createjs.Ease.quartIn)
     .to({x:enemy2.position.x + 200}, 2000, createjs.Ease.getelasticInOut)
-    .to({y:enemy2.position.y}, 5000, createjs.Ease.getPowOut)
+    .to({y:enemy2.position.y}, 5000, createjs.Ease.quartOut)
     .to({x:enemy2.position.x}, 6000, createjs.Ease.sineIn);
      animate();
 }
@@ -362,6 +364,20 @@ if (!(enemy2.x > (player.position.x + player.width/2) || (enemy2.x + enemy2.widt
 function update_camera() {
     stage.x = -player.x*gameScale + gameWidth/2 - player.width/2*gameScale;
     stage.y = -player.y*gameScale + gameHeight/2 - player.height/2*gameScale;
-    stage.x = -Math.max(0, Math.min(1280*gameScale, -stage.x));
-    stage.y = -Math.max(0, Math.min(world.worldHeight*gameScale - gameHeight, -stage.y));
+    if (entity_layer.visible == true){
+      stage.x = -Math.max(0, Math.min(1280*gameScale-gameWidth, -stage.x));
+      stage.y = -Math.max(0, Math.min(world.worldHeight*gameScale - gameHeight, -stage.y));
+    }
+    else if (pink.visible == true) {
+      stage.x = -Math.max(1280*gameScale, Math.min(1696*gameScale-gameWidth, -stage.x));
+      stage.y = -Math.max(320*gameScale, Math.min(640*gameScale - gameHeight, -stage.y));
+    }
+    else if(orange.visible == true) {
+      stage.x = -Math.max(1280*gameScale, Math.min(1696*gameScale-gameWidth, -stage.x));
+      stage.y = -Math.max(0, Math.min(320*gameScale - gameHeight, -stage.y));
+    }
+    else if(blue.visible == true){
+      stage.x = -Math.max(1280*gameScale, Math.min(1696*gameScale-gameWidth, -stage.x));
+      stage.y = -Math.max(640*gameScale, Math.min(960*gameScale - gameHeight, -stage.y));
+    }
 }
