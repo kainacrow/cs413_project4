@@ -2,16 +2,16 @@
 
 "arrow.png":
 {
-	"frame": {"x":0,"y":0,"w":32,"h":23},
+	"frame": {"x":0,"y":0,"w":10,"h":10},
 	"rotated": false,
 	"trimmed": false,
-	"spriteSourceSize": {"x":0,"y":0,"w":32,"h":23},
-	"sourceSize": {"w":32,"h":23},
+	"spriteSourceSize": {"x":0,"y":0,"w":10,"h":10},
+	"sourceSize": {"w":10,"h":10},
 	"pivot": {"x":0.5,"y":0.5}
 },
 "fire.png":
 {
-	"frame": {"x":32,"y":0,"w":28,"h":28},
+	"frame": {"x":10,"y":0,"w":28,"h":28},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":28,"h":28},
@@ -20,7 +20,7 @@
 },
 "fridge.png":
 {
-	"frame": {"x":60,"y":0,"w":70,"h":140},
+	"frame": {"x":38,"y":0,"w":70,"h":140},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":70,"h":140},
@@ -29,7 +29,7 @@
 },
 "frosty.png":
 {
-	"frame": {"x":130,"y":0,"w":28,"h":28},
+	"frame": {"x":108,"y":0,"w":28,"h":28},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":28,"h":28},
@@ -38,7 +38,7 @@
 },
 "ghost.png":
 {
-	"frame": {"x":158,"y":0,"w":28,"h":28},
+	"frame": {"x":136,"y":0,"w":28,"h":28},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":28,"h":28},
@@ -47,7 +47,7 @@
 },
 "ghost2.png":
 {
-	"frame": {"x":186,"y":0,"w":28,"h":28},
+	"frame": {"x":164,"y":0,"w":28,"h":28},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":28,"h":28},
@@ -56,7 +56,7 @@
 },
 "ghost3.png":
 {
-	"frame": {"x":214,"y":0,"w":28,"h":28},
+	"frame": {"x":192,"y":0,"w":28,"h":28},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":28,"h":28},
@@ -65,7 +65,7 @@
 },
 "ghost4.png":
 {
-	"frame": {"x":242,"y":0,"w":28,"h":28},
+	"frame": {"x":220,"y":0,"w":28,"h":28},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":28,"h":28},
@@ -74,7 +74,7 @@
 },
 "grey.png":
 {
-	"frame": {"x":270,"y":0,"w":28,"h":28},
+	"frame": {"x":248,"y":0,"w":28,"h":28},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":28,"h":28},
@@ -83,7 +83,7 @@
 },
 "ice.png":
 {
-	"frame": {"x":298,"y":0,"w":28,"h":28},
+	"frame": {"x":276,"y":0,"w":28,"h":28},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":28,"h":28},
@@ -106,6 +106,6 @@
 	"format": "RGBA8888",
 	"size": {"w":1050,"h":790},
 	"scale": "1",
-	"smartupdate": "$TexturePacker:SmartUpdate:ac54789a7b87e56e9d015d9f119b26d3:a52a26a2406fd7dd899ccb598c6271e2:a759b6bbc8381ac9c472b28f589ad0d6$"
+	"smartupdate": "$TexturePacker:SmartUpdate:579c99df20114f1cc217a85d6be22db5:9d04648462d9b30dcf5a2e2496dc5d04:a759b6bbc8381ac9c472b28f589ad0d6$"
 }
 }
