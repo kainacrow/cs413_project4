@@ -93,6 +93,10 @@ var frosty;
 var textures = {};
 var gameSound;
 
+var infoText;
+
+var restart = false;
+
 function keyupEventHandler(e) {
     keys[e.which] = false;
 }
@@ -103,22 +107,31 @@ function keydownEventHandler(e) {
     
     if (inMenu) {
 			if (e.which === 87 || e.which === 38) {
-        if (atMainMenu) menuStateMachine.up();
+        if (atMainMenu) {
+          menuStateMachine.up();
+        }
 			}
 			else if (e.which === 83 || e.which === 40) { 
-        if (atMainMenu) menuStateMachine.down();
+        if (atMainMenu) {
+          menuStateMachine.down();
+        }
 			}
-			else if ((e.which === 27 || e.which === 13 || e.which === 32) && !atMainMenu) loadMainMenu();
+			else if ((e.which === 27 || e.which === 13 || e.which === 32) && !atMainMenu) {
+        loadMainMenu();
+      }
 			else if (e.which === 13 || e.which === 32) { 
 				if (atMainMenu) menu.getChildAt(currentState+2).action(); 
 			}
 		}
+    else{
 			if ((e.which === 13 || e.which === 32) && restart) startGame();
 			if ((e.which === 27 || e.which === 8) && restart) loadMainMenu();
+    }
 		
 	    if([32, 37, 38, 39, 40].indexOf(e.which) > -1) {
 	        e.preventDefault();
-	    }    
+	    }  
+		  
     movePlayer();
 }
 
@@ -384,7 +397,7 @@ function loadInstructions() {
 		title = new PIXI.extras.BitmapText("Credits:",{font: "58px minecraft", align: "center"});
 		title.scale.x = 1/GAME_SCALE;
 		title.scale.y = 1/GAME_SCALE;
-		title.position.x = GAME_WIDTH/GAME_SCALE/2 - infoText.width/2;
+		title.position.x = GAME_WIDTH/GAME_SCALE/2 - title.width/2;
 		title.position.y = 10;
 		menu.addChild(title);
 
@@ -513,6 +526,7 @@ function gameOver() {
     
     clearStage();
 		atMainMenu = false;
+    restart = true;
     
 		menu = new PIXI.Container();
 
@@ -523,14 +537,14 @@ function gameOver() {
     stage.x = 0;
 		menu.addChild(background);
 
-		title = new PIXI.extras.BitmapText("\n\nOH NO!",{font: "58px minecraft", align: "center"});
+		title = new PIXI.extras.BitmapText("\nOH NO!",{font: "58px minecraft", align: "center"});
 		title.scale.x = 1/GAME_SCALE;
 		title.scale.y = 1/GAME_SCALE;
 		title.position.x = GAME_WIDTH/GAME_SCALE/2 - title.width/2;
 		title.position.y = 10;
 		menu.addChild(title);
 
-		loseText = new PIXI.extras.BitmapText("\n\n\nYou have been defeated by\nthe fire ghosts!\n\nYour village has been taken over!",{font: "36px minecraft", align: "center"});
+		loseText = new PIXI.extras.BitmapText("\n\nYou have been defeated by\nthe fire ghosts!\n\nYour village has been taken over!\n\n\n\nPress Enter to play again\n\nPress ESC to go back to the Main Menu",{font: "36px minecraft", align: "center"});
 		loseText.scale.x = 1/GAME_SCALE;
 		loseText.scale.y = 1/GAME_SCALE;
 		loseText.position.x = GAME_WIDTH/GAME_SCALE/2 - loseText.width/2;
